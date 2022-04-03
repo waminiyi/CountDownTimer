@@ -31,25 +31,25 @@ public class CountDownActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_count_down);
-        mStopButton=findViewById(R.id.button_stop);
-        mPauseButton=findViewById(R.id.button_start);
-        mRemainingTimeTextView=findViewById(R.id.remaining_time);
-        mTotalTimeTextView=findViewById(R.id.tv_total_time);
-        mProgressBar=findViewById(R.id.progress_bar);
+        mStopButton = findViewById(R.id.button_stop);
+        mPauseButton = findViewById(R.id.button_start);
+        mRemainingTimeTextView = findViewById(R.id.remaining_time);
+        mTotalTimeTextView = findViewById(R.id.tv_total_time);
+        mProgressBar = findViewById(R.id.progress_bar);
 
 
-        Bundle bundle=getIntent().getExtras();
-        mSelectedHour=bundle.getInt("selectedHour");
-        mSelectedMinute=bundle.getInt("selectedMinute");
-        mSelectedSecond=bundle.getInt("selectedSecond");
+        Bundle bundle = getIntent().getExtras();
+        mSelectedHour = bundle.getInt("selectedHour");
+        mSelectedMinute = bundle.getInt("selectedMinute");
+        mSelectedSecond = bundle.getInt("selectedSecond");
 
-        String remainTimeformated= "Temps total: " + String.format(Locale.getDefault(), "%02d:%02d:%02d",mSelectedHour, mSelectedMinute, mSelectedSecond);
+        String remainTimeformated = "Temps total: " + String.format(Locale.getDefault(), "%02d:%02d:%02d", mSelectedHour, mSelectedMinute, mSelectedSecond);
         mTotalTimeTextView.setText(remainTimeformated);
         mProgressBar.setProgress(progress);
-        mTimeLeftInMillis= (long) mSelectedHour *3600000 + (long) mSelectedMinute*60000+(long)mSelectedSecond*1000;
-        mTimeTotalInMillis=mTimeLeftInMillis;
+        mTimeLeftInMillis = (long) mSelectedHour * 3600000 + (long) mSelectedMinute * 60000 + (long) mSelectedSecond * 1000;
+        mTimeTotalInMillis = mTimeLeftInMillis;
         //int progressMax=Math.toIntExact(mTimeTotalInMillis);
-        int progressMax=(int)mTimeTotalInMillis/1000;
+        int progressMax = (int) mTimeTotalInMillis / 1000;
         mProgressBar.setMax(progressMax);
 
         startCountDown();
@@ -65,14 +65,18 @@ public class CountDownActivity extends AppCompatActivity {
         mPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mPauseButton.getText().toString().equals("Pause")){
+                if (mPauseButton.getText().toString().equals("Pause")) {
                     mCountDownTimer.cancel();
                     mPauseButton.setText("Reprendre");
-                }else {
+                } else if (mPauseButton.getText().toString().equals("Reprendre")) {
                     startCountDown();
                     mPauseButton.setText("Pause");
+                } else {
+                    mTimeLeftInMillis = mTimeTotalInMillis;
+                    startCountDown();
+                    mPauseButton.setText("Pause");
+                    mStopButton.setText("Arrêter");
                 }
-
             }
         });
 
@@ -94,6 +98,8 @@ public class CountDownActivity extends AppCompatActivity {
                 updateCountDownText();
                 updateProgress(mTimeLeftInMillis);
                 Toast.makeText(CountDownActivity.this, "Temps écoulé!", Toast.LENGTH_LONG).show();
+                mStopButton.setText("Quitter");
+                mPauseButton.setText("Redémarrer");
             }
         }.start();
     }
@@ -101,20 +107,20 @@ public class CountDownActivity extends AppCompatActivity {
     // méthode qui gère l'affichage du minuteur
     private void updateCountDownText() {
         int hours = (int) (mTimeLeftInMillis / 1000) / 3600;
-        int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600)/60;
+        int minutes = (int) ((mTimeLeftInMillis / 1000) % 3600) / 60;
         int seconds = (int) (mTimeLeftInMillis / 1000) % 60;
         //formatage  du minuteur minute:seconde
-        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d:%02d",hours, minutes, seconds);
+        String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d:%02d", hours, minutes, seconds);
         mRemainingTimeTextView.setText(timeFormatted);
 
     }
 
-    private void updateProgress(long remainTime){
+    private void updateProgress(long remainTime) {
         /*new Thread(new Runnable() {
             @Override
             public void run() {*/
-                progress=(int) remainTime/ 1000;
-                mProgressBar.setProgress(progress);
-        }
-
+        progress = (int) remainTime / 1000;
+        mProgressBar.setProgress(progress);
     }
+
+}
